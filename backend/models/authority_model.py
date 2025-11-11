@@ -1,29 +1,32 @@
 from database.mongo import mongo
 from flask_bcrypt import generate_password_hash, check_password_hash
 
-class UserModel:
+class AuthorityModel:
 
     @staticmethod
     def get_collection():
-        # Safely access the collection after Flask initializes mongo
-        return mongo.db.users
+        # Access the Mongo collection safely AFTER Flask initializes Mongo
+        return mongo.db.authorities
 
     @staticmethod
-    def create_user(name, email, password, role="user"):
+    def create_authority(name, email, password, station, lat, lng):
         hashed_pw = generate_password_hash(password).decode('utf-8')
 
-        user_id = UserModel.get_collection().insert_one({
+        authority_id = AuthorityModel.get_collection().insert_one({
             "name": name,
             "email": email,
             "password": hashed_pw,
-            "role": role
+            "role": "authority",
+            "station": station,
+            "area": {"lat": lat, "lng": lng},
+            "is_available": True
         }).inserted_id
 
-        return user_id
+        return authority_id
 
     @staticmethod
     def find_by_email(email):
-        return UserModel.get_collection().find_one({"email": email})
+        return AuthorityModel.get_collection().find_one({"email": email})
 
     @staticmethod
     def verify_password(hashed_password, password):

@@ -64,7 +64,7 @@ def login():
 
 
 # 🧩 Get Current User
-@auth_bp.route('/me', methods=['GET'])
+@auth_bp.route('/profile', methods=['GET'])
 @jwt_required()
 def get_user():
     user_id = get_jwt_identity()  # this is now a string
@@ -80,4 +80,33 @@ def get_user():
         "name": user["name"],
         "email": user["email"],
         "role": role
+    }), 200
+
+
+# edit profile
+@auth_bp.route('/profile', methods=['PUT'])
+@jwt_required()
+def edit_profile():
+    user_id = get_jwt_identity()
+    data = request.data_dict
+
+    update_data = {}
+    if "name" in data:
+        update_data["name"] = data["name"]
+    if "email" in data:
+        update_data["email"] = data["email"]
+    if "password" in data:
+        hashed_pw = UserModel.generate_password_hash(data["password"]).decode('utf-8')
+        update_data["password"] = hashed_pw
+
+    if not update_data:
+        return jsonify({"error": "No valid fields to update"}), 400
+
+    mongo.db.users.update_one({"_id": ObjectId(user_id)}, {"$set": update_data})
+
+    user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+
+    return jsonify({
+        "message": "Profile updated successfully",
+        "user": serialize_user(user)
     }), 200
