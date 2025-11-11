@@ -4,6 +4,7 @@ from bson import ObjectId
 from datetime import timedelta
 from models.user_model import UserModel
 from database.mongo import mongo
+from flask_bcrypt import generate_password_hash
 
 auth_bp = Blueprint('auth_bp', __name__)
 
@@ -83,7 +84,7 @@ def get_user():
     }), 200
 
 
-# edit profile
+# Edit profile route
 @auth_bp.route('/profile', methods=['PUT'])
 @jwt_required()
 def edit_profile():
@@ -91,20 +92,38 @@ def edit_profile():
     data = request.data_dict
 
     update_data = {}
-    if "name" in data:
-        update_data["name"] = data["name"]
-    if "email" in data:
-        update_data["email"] = data["email"]
-    if "password" in data:
-        hashed_pw = UserModel.generate_password_hash(data["password"]).decode('utf-8')
+
+    # Update name if provided
+    if "name" in data and data["name"].strip():
+        update_data["name"] = data["name"].strip()
+
+    # Update email if provided
+    if "email" in data and data["email"].strip():
+        update_data["email"] = data["email"].strip()
+
+    # Update password if provided
+    if "password" in data and data["password"].strip():
+        hashed_pw = generate_password_hash(data["password"]).decode('utf-8')
         update_data["password"] = hashed_pw
 
+    # No valid fields?
     if not update_data:
         return jsonify({"error": "No valid fields to update"}), 400
 
+    # Perform the update in MongoDB
     mongo.db.users.update_one({"_id": ObjectId(user_id)}, {"$set": update_data})
 
+    # Fetch the updated user
     user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+
+    # Helper to format the response
+    def serialize_user(user):
+        return {
+            "id": str(user["_id"]),
+            "name": user.get("name"),
+            "email": user.get("email"),
+            "role": user.get("role", "user")
+        }
 
     return jsonify({
         "message": "Profile updated successfully",

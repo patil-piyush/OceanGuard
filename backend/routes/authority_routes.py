@@ -129,23 +129,29 @@ def update_profile():
 @authority_bp.route('/availability', methods=['PUT'])
 @jwt_required()
 def update_availability():
-    authority_id = get_jwt_identity()
     data = request.data_dict
+    user_id = get_jwt_identity()
 
-    is_available = data.get("is_available")
-    if is_available is None:
-        return jsonify({"error": "is_available field is required"}), 400
+    raw_value = data.get("is_available")
 
-    if not isinstance(is_available, bool):
-        return jsonify({"error": "is_available must be a boolean"}), 400
+    # Safely convert string to boolean
+    if isinstance(raw_value, bool):
+        is_available = raw_value
+    elif isinstance(raw_value, str):
+        if raw_value.lower() in ["true", "1", "yes"]:
+            is_available = True
+        elif raw_value.lower() in ["false", "0", "no"]:
+            is_available = False
+        else:
+            return jsonify({"error": "Invalid boolean value for is_available"}), 400
+    else:
+        return jsonify({"error": "is_available must be provided"}), 400
 
-    result = AuthorityModel.get_collection().update_one(
-        {"_id": ObjectId(authority_id)},
+    # Update in MongoDB
+    mongo.db.authorities.update_one(
+        {"_id": ObjectId(user_id)},
         {"$set": {"is_available": is_available}}
     )
-
-    if result.matched_count == 0:
-        return jsonify({"error": "Authority not found"}), 404
 
     return jsonify({
         "message": "Availability updated successfully",
