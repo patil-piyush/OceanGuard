@@ -6,6 +6,7 @@ from config import Config
 from database.mongo import mongo
 from routes.authority_routes import authority_bp
 from routes.user_routes import auth_bp
+from routes.report_routes import report_bp
 
 bcrypt = Bcrypt()
 jwt = JWTManager()
@@ -43,6 +44,8 @@ def create_app():
     # Register blueprints
     app.register_blueprint(auth_bp, url_prefix="/api/user")
     app.register_blueprint(authority_bp, url_prefix="/api/authority")
+    app.register_blueprint(report_bp, url_prefix="/api/report")
+
 
 
     @app.route('/')
