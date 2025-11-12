@@ -4,6 +4,9 @@ from datetime import timedelta
 from bson import ObjectId
 from models.authority_model import AuthorityModel
 from database.mongo import mongo
+from models.report_model import ReportModel
+
+
 
 authority_bp = Blueprint('authority_bp', __name__)
 
@@ -157,3 +160,132 @@ def update_availability():
         "message": "Availability updated successfully",
         "is_available": is_available
     }), 200
+
+
+
+
+
+# Allowed status transitions (you can adjust as you want)
+ALLOWED_STATUSES = ["accepted", "in_progress", "cleaned", "completed", "rejected"]
+
+
+# Helper: Works with both JSON and multipart/form-data
+def get_request_data():
+    if request.is_json:
+        return request.get_json() or {}
+    elif request.form:
+        return request.form.to_dict()
+    else:
+        return {}
+
+
+# PATCH: authority decision (accept or reject)
+@authority_bp.route('/decision', methods=['PATCH'])
+@jwt_required()
+def authority_decision():
+    """
+    Authority accepts or rejects a report.
+    Body: { "report_id": "...", "decision": "accept"|"reject", "remarks": "optional" }
+    """
+    authority_id = get_jwt_identity()
+    data = get_request_data()    
+    report_id = data.get("report_id")
+    decision = (data.get("decision") or "").lower()
+    remarks = data.get("remarks")
+
+    if not report_id or decision not in ["accept", "reject"]:
+        return jsonify({"error": "report_id and decision ('accept'|'reject') required"}), 400
+
+    # optionally fetch authority name for history
+    authority = None
+    try:
+        authority = AuthorityModel.find_by_id(ObjectId(authority_id)) if isinstance(authority_id, str) else AuthorityModel.find_by_id(authority_id)
+        authority_name = authority.get("name") if authority else str(authority_id)
+    except Exception:
+        authority_name = str(authority_id)
+
+    if decision == "accept":
+        res = ReportModel.assign_authority(report_id, authority_id, authority_name=authority_name, remarks=remarks)
+        if res.matched_count == 0:
+            return jsonify({"error": "Cannot accept: report may be already assigned, not pending, or you were not notified."}), 400
+        return jsonify({"message": "Report accepted successfully", "status": "accepted"}), 200
+
+    else:  # reject
+        res = ReportModel.reject_report(report_id, authority_id, authority_name=authority_name, remarks=remarks)
+        if res.matched_count == 0:
+            return jsonify({"error": "Cannot reject: you were not notified about this report"}), 400
+        return jsonify({"message": "Report rejected successfully", "status": "rejected"}), 200
+
+
+
+# PATCH: authority updates status of an assigned report
+@authority_bp.route('/update_status', methods=['PATCH'])
+@jwt_required()
+def authority_update_status():
+    """
+    Authority updates the status of an assigned report.
+    Body: { "report_id": "...", "status": "in_progress"|"cleaned"|"completed", "remarks": "optional" }
+    """
+    authority_id = get_jwt_identity()
+    data = get_request_data()
+    report_id = data.get("report_id")
+    new_status = (data.get("status") or "").lower()
+    remarks = data.get("remarks")
+
+    if not report_id or new_status not in ALLOWED_STATUSES:
+        return jsonify({"error": f"report_id and valid status required. Allowed: {ALLOWED_STATUSES}"}), 400
+
+    # ensure authority is assigned to this report
+    report = ReportModel.find_by_id(report_id)
+    if not report:
+        return jsonify({"error": "Report not found"}), 404
+
+    if not report.get("assigned_authority"):
+        return jsonify({"error": "Report is not assigned to any authority"}), 400
+
+    # assigned_authority stored as ObjectId
+    assigned = str(report.get("assigned_authority"))
+    if str(authority_id) != assigned:
+        return jsonify({"error": "You are not the assigned authority for this report"}), 403
+
+    # perform update
+    authority_name = None
+    try:
+        authority_doc = AuthorityModel.find_by_id(ObjectId(authority_id))
+        authority_name = authority_doc.get("name") if authority_doc else str(authority_id)
+    except Exception:
+        authority_name = str(authority_id)
+
+    res = ReportModel.update_status(report_id, authority_id, new_status, remarks=remarks, authority_name=authority_name)
+
+    if res.matched_count == 0:
+        return jsonify({"error": "Status update failed (check permissions)"}), 400
+
+    # Optionally: notify the user about status change (you can implement an email_service.notify_user)
+    # e.g. notify_user(report['user_id'], f"Report status updated to {new_status}", ...)
+
+    return jsonify({"message": "Status updated successfully", "current_status": new_status}), 200
+
+
+# GET: authority history (completed reports for this authority)
+@authority_bp.route('/history', methods=['GET'])
+@jwt_required()
+def authority_history():
+    authority_id = get_jwt_identity()
+    completed = ReportModel.get_completed_by_authority(authority_id)
+
+    out = []
+    for r in completed:
+        out.append({
+            "id": str(r["_id"]),
+            "type": r.get("type"),
+            "status": r.get("status"),
+            "image_url": r.get("image_url"),
+            "location": r.get("location"),
+            "predicted_path": r.get("predicted_path", []),
+            "created_at": r.get("created_at").isoformat() if r.get("created_at") else None,
+            "updated_at": r.get("updated_at").isoformat() if r.get("updated_at") else None,
+            "history": r.get("history", [])
+        })
+
+    return jsonify({"reports": out}), 200

@@ -16,16 +16,14 @@ from models.report_model import ReportModel
 report_bp = Blueprint("report_bp", __name__)
 
 
-# =====================================================================
-# 🛰️ Create new report (User)
-# =====================================================================
+# Create new report (User)
 @report_bp.route('/create', methods=['POST'])
 @jwt_required()
 def create_report():
     user_id = get_jwt_identity()
     data = request.data_dict
 
-    # ✅ Input validation
+    # Input validation
     image_file = data.get("image")
     lat_val = data.get("lat")
     lng_val = data.get("lng") or data.get("long")
@@ -39,11 +37,11 @@ def create_report():
     except (TypeError, ValueError):
         return jsonify({"error": "Latitude and Longitude must be numeric"}), 400
 
-    # 🧠 1) Run ML detection (YOLO + optional debris model)
+    # 1) Run ML detection (YOLO + optional debris model)
     try:
         processed_path, detected_type, confidences = run_detection(image_file)
     except Exception as e:
-        print("⚠️ Detection failed:", e)
+        print("Detection failed:", e)
         return jsonify({"error": "Failed to run ML models", "details": str(e)}), 500
 
     if detected_type == "none":
@@ -51,27 +49,27 @@ def create_report():
 
     report_type = detected_type
 
-    # 🖼️ 2) Upload annotated image to Cloudinary
+    # 2) Upload annotated image to Cloudinary
     try:
         with open(processed_path, "rb") as f:
             image_url = upload_image(f)
     except Exception as e:
-        print("⚠️ Cloudinary upload failed:", e)
+        print("Cloudinary upload failed:", e)
         return jsonify({"error": "Failed to upload image", "details": str(e)}), 500
 
-    # 🌦️ 3) Fetch weather and current data
+    # 3) Fetch weather and current data
     weather = fetch_weather_data(lat, lng)
 
-    # 🌊 4) Predict debris/oil drift trajectory
+    # 4) Predict debris/oil drift trajectory
     predicted_path = predict_trajectory(
         lat, lng, weather, report_type, steps=6, interval_minutes=30
     )
 
-    # 🚨 5) Find authorities nearby (within 10 km)
+    # 5) Find authorities nearby (within 10 km)
     nearby_authorities = AuthorityModel.get_nearby_authorities(lat, lng, radius_km=10)
     notified_ids = [a["_id"] for a in nearby_authorities]
 
-    # 🗃️ 6) Save report in MongoDB
+    # 6) Save report in MongoDB
     report_id = ReportModel.create_report(
         user_id=user_id,
         image_url=image_url,
@@ -87,13 +85,13 @@ def create_report():
         },
     )
 
-    # 📩 7) Notify nearby authorities by email
+    # 7) Notify nearby authorities by email
     try:
         notify_authorities(lat, lng, report_type, image_url, predicted_path, radius_km=10)
     except Exception as e:
-        print("⚠️ Email notification failed:", e)
+        print("Email notification failed:", e)
 
-    # ✅ 8) Send final response
+    # 8) Send final response
     return jsonify({
         "message": f"{report_type.replace('_',' ').title()} detected and reported successfully",
         "report_id": str(report_id),
@@ -104,9 +102,7 @@ def create_report():
     }), 201
 
 
-# =====================================================================
-# 📜 User Report History
-# =====================================================================
+# User Report History
 @report_bp.route('/history', methods=['GET'])
 @jwt_required()
 def user_history():
@@ -128,9 +124,7 @@ def user_history():
     return jsonify({"reports": output}), 200
 
 
-# =====================================================================
-# 🧭 Authority: Assigned Reports (within their region)
-# =====================================================================
+# Authority: Assigned Reports (within their region)
 @report_bp.route('/authority/assigned', methods=['GET'])
 @jwt_required()
 def authority_assigned_reports():

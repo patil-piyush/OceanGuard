@@ -1,4 +1,3 @@
-# services/email_service.py
 import os
 from models.authority_model import AuthorityModel
 # For production use an email provider like SendGrid, SES, etc.
