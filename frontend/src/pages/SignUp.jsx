@@ -150,7 +150,6 @@ export default function SignUp({ onLogin }) {
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
               <label htmlFor="name">
-                <span className="label-icon">👤</span>
                 Full Name
               </label>
               <input
@@ -166,7 +165,6 @@ export default function SignUp({ onLogin }) {
 
             <div className="form-group">
               <label htmlFor="email">
-                <span className="label-icon">✉️</span>
                 Email Address
               </label>
               <input
@@ -183,7 +181,6 @@ export default function SignUp({ onLogin }) {
             {formData.role === "authority" && (
               <div className="form-group">
                 <label htmlFor="organization">
-                  <span className="label-icon">🏢</span>
                   Organization Name
                 </label>
                 <input
@@ -200,7 +197,6 @@ export default function SignUp({ onLogin }) {
 
             <div className="form-group">
               <label htmlFor="password">
-                <span className="label-icon">🔒</span>
                 Password
               </label>
               <div className="password-input-wrapper">
@@ -244,7 +240,6 @@ export default function SignUp({ onLogin }) {
 
             <div className="form-group">
               <label htmlFor="confirmPassword">
-                <span className="label-icon">🔒</span>
                 Confirm Password
               </label>
               <div className="password-input-wrapper">
