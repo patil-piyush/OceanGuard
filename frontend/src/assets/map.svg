@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true">
+  <path d="M3 6.5v11.5l6-2 6 2 6-4V4.5l-6 2-6-2-6 4z" fill="#E9F6FF" stroke="#1976D2" stroke-width="0.9"/>
+  <path d="M9 6v8" stroke="#1976D2" stroke-width="0.9" stroke-linecap="round"/>
+</svg>

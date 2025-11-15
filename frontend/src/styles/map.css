@@ -1,0 +1,164 @@
+.trajectory-map {
+  padding: var(--spacing-lg);
+  background-color: var(--bg-dark);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.trajectory-map h4 {
+  color: var(--ocean-light);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1rem;
+}
+
+.map-loading {
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--text-secondary);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.ocean-data {
+  padding: var(--spacing-lg);
+  background-color: rgba(0, 212, 255, 0.05);
+  border-left: 3px solid var(--ocean-light);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  font-family: var(--font-mono);
+}
+
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-sm) 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-row:last-child {
+  border-bottom: none;
+}
+
+.data-row .label {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.data-row .value {
+  color: var(--ocean-light);
+  font-weight: 700;
+}
+
+.wind-visual {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wind-text {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.wind-arrow {
+  width: 80px;
+  height: 40px;
+}
+
+.trajectory-timeline {
+  margin-bottom: var(--spacing-lg);
+}
+
+.trajectory-point {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) 0;
+  align-items: flex-start;
+  position: relative;
+  padding-left: var(--spacing-lg);
+}
+
+.trajectory-point::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 8px;
+  bottom: -20px;
+  width: 1px;
+  background: var(--border-color);
+}
+
+.trajectory-point:last-child::before {
+  display: none;
+}
+
+.point-circle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--ocean-light);
+  position: relative;
+  z-index: 1;
+  margin-top: 4px;
+}
+
+.point-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.point-time {
+  color: var(--ocean-light);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.point-coords {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+}
+
+.map-note {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+}
+
+.trajectory-embed iframe {
+  width: 100%;
+  height: 420px;
+  border-radius: var(--radius-md);
+  display: block;
+}
+
+.wind-icon {
+  pointer-events: none;
+}
+
+.wind-icon svg {
+  display: block;
+}
+
+.map-error {
+  padding: var(--spacing-lg);
+  background: rgba(255, 82, 82, 0.06);
+  color: var(--danger, #ff5252);
+  border: 1px solid rgba(255,82,82,0.12);
+  border-radius: var(--radius-md);
+}

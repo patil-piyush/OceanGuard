@@ -1,0 +1,216 @@
+.analysis-panel {
+  position: relative;
+  padding: var(--spacing-xl);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.btn-close {
+  position: absolute;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-close:hover {
+  color: var(--ocean-light);
+}
+
+.analysis-panel h3 {
+  color: var(--ocean-light);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.2rem;
+}
+
+.analysis-image {
+  margin-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.analysis-image img {
+  width: 100%;
+  height: auto;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  display: block;
+}
+
+.results-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background-color: var(--bg-dark);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.result-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.result-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.result-value.confidence-high {
+  color: var(--success);
+}
+
+.result-value.confidence-medium {
+  color: var(--warning);
+}
+
+.result-value.severity-high {
+  color: var(--danger);
+}
+
+.result-value.severity-medium {
+  color: var(--warning);
+}
+
+.suggestions {
+  margin-bottom: var(--spacing-lg);
+}
+
+.suggestions h4 {
+  color: var(--ocean-light);
+  margin-bottom: var(--spacing-md);
+}
+
+.suggestions ul {
+  list-style: none;
+  padding: 0;
+}
+
+.suggestions li {
+  padding: var(--spacing-sm) 0;
+  padding-left: var(--spacing-lg);
+  position: relative;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.suggestions li:before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--ocean-light);
+  font-weight: 600;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.btn-alert,
+.btn-report,
+.btn-map {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.btn-alert {
+  background-color: var(--danger);
+  color: white;
+}
+
+.btn-alert:hover:not(:disabled) {
+  background-color: #dc2626;
+  transform: translateY(-2px);
+}
+
+.btn-alert:disabled {
+  background-color: var(--success);
+  cursor: default;
+}
+
+.btn-report,
+.btn-map {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-report:hover,
+.btn-map:hover {
+  background-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.map-placeholder {
+  padding: var(--spacing-lg);
+  background-color: var(--bg-dark);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+.map-info {
+  color: var(--ocean-light);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  margin-top: var(--spacing-md);
+}
+
+.alert-confirmation {
+  padding: var(--spacing-lg);
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.alert-confirmation p {
+  margin-bottom: var(--spacing-md);
+  color: var(--success);
+  font-weight: 600;
+}
+
+.alert-confirmation ul {
+  list-style: none;
+  padding: 0;
+}
+
+.alert-confirmation li {
+  padding: var(--spacing-xs) 0;
+  padding-left: var(--spacing-lg);
+  position: relative;
+}
+
+.alert-confirmation li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--success);
+}

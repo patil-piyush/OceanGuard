@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80" viewBox="0 0 120 80" fill="none">
+  <rect width="120" height="80" rx="10" fill="#1a1f3a"/>
+  <g transform="translate(12,12)" fill="#f59e0b">
+    <path d="M10 40c6-12 24-20 40-20s34 8 40 20v8H10v-8z" fill="#f59e0b" opacity="0.95"/>
+    <rect x="6" y="28" width="18" height="6" rx="2" fill="#d97706"/>
+    <rect x="40" y="18" width="12" height="6" rx="2" fill="#d97706"/>
+    <rect x="64" y="24" width="20" height="6" rx="2" fill="#d97706"/>
+  </g>
+  <text x="60" y="72" font-family="Segoe UI, Roboto, sans-serif" font-size="10" fill="#9ca3af" text-anchor="middle">Debris Sample</text>
+</svg>

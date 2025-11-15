@@ -1,0 +1,143 @@
+.analytics-container {
+  padding: var(--spacing-xl);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  margin-top: var(--spacing-xl);
+}
+
+.analytics-container h3 {
+  color: var(--ocean-light);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.2rem;
+}
+
+.chart-container {
+  margin-bottom: var(--spacing-xl);
+}
+
+.chart-title {
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.95rem;
+}
+
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  height: 250px;
+  padding: var(--spacing-lg) var(--spacing-md);
+  background-color: var(--bg-dark);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  overflow-x: auto;
+}
+
+.chart-bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+  min-width: 40px;
+}
+
+.bar-column {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: flex-end;
+  height: 200px;
+}
+
+.bar-stack {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bar {
+  width: 100%;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.bar:hover {
+  opacity: 0.8;
+  transform: translateY(-2px);
+}
+
+.bar-debris {
+  background: linear-gradient(180deg, var(--ocean-light) 0%, var(--ocean-medium) 100%);
+}
+
+.bar-oil {
+  background: linear-gradient(180deg, var(--warning) 0%, #d97706 100%);
+}
+
+.month-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+.chart-legend {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-lg);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.legend-box {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-sm);
+}
+
+.legend-box.debris {
+  background: var(--ocean-light);
+}
+
+.legend-box.oil {
+  background: var(--warning);
+}
+
+.legend-box.alert {
+  background: var(--danger);
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--ocean-light);
+  margin-bottom: var(--spacing-sm);
+}
+
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
