@@ -72,7 +72,6 @@ export default function Dashboard({ userRole, onLogout }) {
   };
 
   const handleMarkAsClean = (alertId, responseText) => {
-    // Update in debrisDetections or oilDetections depending on which contains the id
     setDebrisDetections((prev) =>
       prev.map((d) => {
         if (d.id === alertId) {
@@ -103,7 +102,6 @@ export default function Dashboard({ userRole, onLogout }) {
       })
     );
 
-    // In a real app, send responseText to reporter via API
     console.log(
       `Sent response to reporter for alert ${alertId}: ${responseText}`
     );
@@ -115,7 +113,6 @@ export default function Dashboard({ userRole, onLogout }) {
   };
 
   const renderContent = () => {
-    // Authority users see Alerts dashboard; monitors see the detection UI (old dashboard)
     if (userRole === "authority") {
       switch (activeTab) {
         case "home":
@@ -139,7 +136,6 @@ export default function Dashboard({ userRole, onLogout }) {
       }
     }
 
-    // Environmental monitor (user) - show detection tools
     switch (activeTab) {
       case "home":
         return <DashboardHome userRole={userRole} />;
@@ -154,11 +150,17 @@ export default function Dashboard({ userRole, onLogout }) {
 
   return (
     <div className="dashboard-container">
+      <div className="dashboard-background">
+        <div className="dashboard-wave wave1"></div>
+        <div className="dashboard-wave wave2"></div>
+      </div>
+
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         isOpen={sidebarOpen}
         userRole={userRole}
+        onLogout={handleLogout}
       />
 
       <div
@@ -167,26 +169,48 @@ export default function Dashboard({ userRole, onLogout }) {
         }`}
       >
         <header className="dashboard-header">
-          <button
-            className="toggle-sidebar"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            ☰
-          </button>
+          <div className="header-left">
+            <button
+              className="toggle-sidebar"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              <span className={`hamburger ${sidebarOpen ? "open" : ""}`}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </button>
 
-          <div className="header-title">
-            <h1>OceanGuard Dashboard</h1>
+            <div className="header-brand">
+              <span className="brand-icon">🌊</span>
+              <div className="brand-text">
+                <h1>OceanGuard</h1>
+                <p>Dashboard</p>
+              </div>
+            </div>
           </div>
 
-          <div className="header-actions">
-            <div className="user-info">
-              <span className="user-role">
-                {userRole === "authority" ? "Authority" : "Monitor"}
-              </span>
+          <div className="header-right">
+            <div className="user-menu">
+              <div className="user-info">
+                <div className="user-avatar">
+                  {userRole === "authority" ? "🛡️" : "👤"}
+                </div>
+                <div className="user-details">
+                  <span className="user-name">
+                    {userRole === "authority" ? "Authority" : "Monitor"}
+                  </span>
+                  <span className="user-role">
+                    {userRole === "authority"
+                      ? "Environmental Authority"
+                      : "Environmental Monitor"}
+                  </span>
+                </div>
+              </div>
+              <button onClick={handleLogout} className="btn-logout">
+                Logout
+              </button>
             </div>
-            <button onClick={handleLogout} className="btn-logout">
-              Logout
-            </button>
           </div>
         </header>
 
@@ -196,32 +220,44 @@ export default function Dashboard({ userRole, onLogout }) {
               className={`nav-tab ${activeTab === "home" ? "active" : ""}`}
               onClick={() => setActiveTab("home")}
             >
-              <span className="tab-icon">📊</span>
-              Dashboard
+              <span className="tab-label">Dashboard</span>
+              {activeTab === "home" && <span className="tab-indicator"></span>}
             </button>
             <button
               className={`nav-tab ${activeTab === "debris" ? "active" : ""}`}
               onClick={() => setActiveTab("debris")}
             >
-              <span className="tab-icon">🗑️</span>
-              Debris Alerts
+              <span className="tab-label">
+                {userRole === "authority"
+                  ? "Debris Alerts"
+                  : "Debris Detection"}
+              </span>
+              {activeTab === "debris" && (
+                <span className="tab-indicator"></span>
+              )}
             </button>
             <button
               className={`nav-tab ${activeTab === "oil" ? "active" : ""}`}
               onClick={() => setActiveTab("oil")}
             >
-              <span className="tab-icon">🛢️</span>
-              Oil Spillage Alerts
+              <span className="tab-label">
+                {userRole === "authority"
+                  ? "Oil Spillage Alerts"
+                  : "Oil Spillage Detection"}
+              </span>
+              {activeTab === "oil" && <span className="tab-indicator"></span>}
             </button>
           </nav>
         </div>
 
         <main className="dashboard-content">{renderContent()}</main>
+
         {selectedAlert && (
           <AlertReport
             alert={selectedAlert}
             onClose={handleCloseReport}
             onMarkAsClean={handleMarkAsClean}
+            userRole={userRole}
           />
         )}
       </div>

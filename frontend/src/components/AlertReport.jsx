@@ -18,36 +18,35 @@ export default function AlertReport({
   const trajectoryData = [
     {
       time: "Now",
-      lat: alert.location.latitude,
-      lon: alert.location.longitude,
+      lat: 20.104,
+      lon: 74.4027,
     },
     {
       time: "1 hour",
-      lat: Number.parseFloat(alert.location.latitude) + 0.02,
-      lon: Number.parseFloat(alert.location.longitude) + 0.01,
+      lat: 20.104 + 1.02,
+      lon: 74.4027 + 1.01,
     },
     {
       time: "2 hours",
-      lat: Number.parseFloat(alert.location.latitude) + 0.04,
-      lon: Number.parseFloat(alert.location.longitude) + 0.02,
+      lat: 20.104 + 2.04,
+      lon: 74.4027 + 0.02,
     },
     {
       time: "6 hours",
-      lat: Number.parseFloat(alert.location.latitude) + 0.1,
-      lon: Number.parseFloat(alert.location.longitude) + 0.05,
+      lat: 20.104 + 0.1,
+      lon: 74.4027 + 0.05,
     },
     {
       time: "12 hours",
-      lat: Number.parseFloat(alert.location.latitude) + 0.18,
-      lon: Number.parseFloat(alert.location.longitude) + 0.1,
+      lat: 20.104 + 1.18,
+      lon: 74.4027 + 0.1,
     },
     {
       time: "24 hours",
-      lat: Number.parseFloat(alert.location.latitude) + 0.35,
-      lon: Number.parseFloat(alert.location.longitude) + 0.2,
+      lat: 20.104 + 0.35,
+      lon: 74.4027 + 2.2,
     },
   ];
-
   const handleMarkAsClean = () => {
     if (!responseText.trim()) {
       alert("Please enter a response before marking as clean");
@@ -60,179 +59,279 @@ export default function AlertReport({
     if (typeof onShowTrajectory === "function") {
       onShowTrajectory(alert);
     } else {
-      // Fallback: log to console (caller can provide behavior)
       console.log("Show trajectory clicked for alert:", alert.id || alert);
     }
+  };
+
+  // Determine icon based on type
+  const getTypeIcon = () => {
+    const typeString = (alert.type || alert.spillageType || "")
+      .toString()
+      .toLowerCase();
+    if (typeString.includes("oil") || typeString.includes("slick")) {
+      return "🛢️";
+    }
+    return "🗑️";
   };
 
   return (
     <div className="report-overlay">
       <div className="report-modal">
         <div className="report-header">
-          <h2>{alert.type} - Detailed Report</h2>
-          <button className="close-btn" onClick={onClose}>
-            ✕
+          <div className="header-content">
+            <span className="header-icon">{getTypeIcon()}</span>
+            <div className="header-text">
+              <h2>{alert.type} - Detailed Report</h2>
+              <span className={`status-pill status-${alert.status}`}>
+                <span className="status-dot"></span>
+                {alert.status.toUpperCase()}
+              </span>
+            </div>
+          </div>
+          <button
+            className="close-btn"
+            onClick={onClose}
+            aria-label="Close report"
+          >
+            <span className="close-icon">✕</span>
           </button>
         </div>
 
         <div className="report-content">
+          {/* Detection Information */}
           <div className="report-section">
-            <h3>Detection Information</h3>
+            <div className="section-header">
+              <h3>Detection Information</h3>
+            </div>
             <div className="info-grid">
-              <div className="info-item">
-                <span className="label">Detection Date:</span>
-                <span className="value">{alert.detectionDate}</span>
+              <div className="info-card">
+                <div className="info-details">
+                  <span className="info-label">Detection Date</span>
+                  <span className="info-value">{alert.detectionDate}</span>
+                </div>
               </div>
-              <div className="info-item">
-                <span className="label">Reported By:</span>
-                <span className="value">
-                  {alert.reportedBy} ({alert.reportedByEmail})
-                </span>
+              <div className="info-card">
+                <div className="info-details">
+                  <span className="info-label">Reported By</span>
+                  <span className="info-value">{alert.reportedBy}</span>
+                  <span className="info-subvalue">{alert.reportedByEmail}</span>
+                </div>
               </div>
-              <div className="info-item">
-                <span className="label">User Score:</span>
-                <span className="value">
-                  {typeof alert.userScore !== "undefined" &&
-                  alert.userScore !== null
-                    ? alert.userScore
-                    : "85%"}
-                </span>
+              <div className="info-card">
+                <div className="info-details">
+                  <span className="info-label">User Score</span>
+                  <span className="info-value">
+                    {typeof alert.userScore !== "undefined" &&
+                    alert.userScore !== null
+                      ? alert.userScore
+                      : "85%"}
+                  </span>
+                </div>
               </div>
-              <div className="info-item">
-                <span className="label">Confidence Level:</span>
-                <span className="value confidence">{alert.confidence}%</span>
+              <div className="info-card">
+                <div className="info-details">
+                  <span className="info-label">Confidence Level</span>
+                  <div className="confidence-display-report">
+                    <div className="confidence-bar-report">
+                      <div
+                        className="confidence-fill-report"
+                        style={{ width: `${alert.confidence}%` }}
+                      ></div>
+                    </div>
+                    <span className="confidence-value-report">
+                      {alert.confidence}%
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="info-item">
-                <span className="label">Severity:</span>
-                <span
-                  className={`value severity-${alert.severity.toLowerCase()}`}
-                >
-                  {alert.severity}
-                </span>
+              <div className="info-card">
+                <div className="info-details">
+                  <span className="info-label">Severity</span>
+                  <span
+                    className={`severity-badge-report severity-${alert.severity.toLowerCase()}`}
+                  >
+                    <span className="severity-icon-report">
+                      {alert.severity === "Critical"
+                        ? "🔴"
+                        : alert.severity === "High"
+                        ? "🟠"
+                        : alert.severity === "Medium"
+                        ? "🟡"
+                        : "🟢"}
+                    </span>
+                    {alert.severity}
+                  </span>
+                </div>
               </div>
-              <div className="info-item">
-                <span className="label">Status:</span>
-                <span className={`value status-${alert.status}`}>
-                  {alert.status.toUpperCase()}
-                </span>
+              <div className="info-card">
+                <div className="info-details">
+                  <span className="info-label">Status</span>
+                  <span
+                    className={`status-badge-report status-${alert.status}`}
+                  >
+                    {alert.status.toUpperCase()}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
+          {/* Location Details */}
           <div className="report-section">
-            <h3>Location Details</h3>
-            <div className="location-info">
-              <div className="coordinates">
-                <p>
-                  <strong>Latitude:</strong>{" "}
-                  {alert.location.latitude.toFixed(6)}
-                </p>
-                <p>
-                  <strong>Longitude:</strong>{" "}
-                  {alert.location.longitude.toFixed(6)}
-                </p>
+            <div className="section-header">
+              <h3>Location Details</h3>
+            </div>
+            <div className="location-card">
+              <div className="coordinates-grid">
+                <div className="coordinate-item">
+                  <span className="coordinate-label">Latitude</span>
+                  <span className="coordinate-value">
+                    20.104000°N
+                  </span>
+                </div>
+                <div className="coordinate-item">
+                  <span className="coordinate-label">Longitude</span>
+                  <span className="coordinate-value">
+                    74.402700°W
+                  </span>
+                </div>
               </div>
-              <div className="map-placeholder">
-                <p>
-                  📍 Location: {alert.location.latitude.toFixed(4)}°,{" "}
-                  {alert.location.longitude.toFixed(4)}°
-                </p>
-              </div>
+              
             </div>
           </div>
 
+          {/* Captured Image */}
           <div className="report-section">
-            <h3>Captured Image</h3>
-            <div className="image-container">
-              {(() => {
-                // Prefer dd.jpg for plastic debris reports
-                const typeString = (
-                  alert.type ||
-                  alert.debrisType ||
-                  alert.spillageType ||
-                  ""
-                )
-                  .toString()
-                  .toLowerCase();
-                const debrisPlastic =
-                  typeString.includes("plastic") ||
-                  typeString.includes("debris");
-                const src = debrisPlastic
-                  ? "/assets/dd.jpg"
-                  : alert.image || HARDCODED_OIL_IMAGE;
-                return (
-                  <img src={src} alt="Detection" className="report-image" />
-                );
-              })()}
-
+            <div className="section-header">
+              <h3>Captured Image</h3>
+            </div>
+            <div className="image-card">
+              <div className="image-wrapper">
+                {(() => {
+                  const typeString = (
+                    alert.type ||
+                    alert.debrisType ||
+                    alert.spillageType ||
+                    ""
+                  )
+                    .toString()
+                    .toLowerCase();
+                  const debrisPlastic =
+                    typeString.includes("plastic") ||
+                    typeString.includes("debris");
+                  const src = debrisPlastic
+                    ? "/assets/dd.jpg"
+                    : alert.image || HARDCODED_OIL_IMAGE;
+                  return (
+                    <img src={src} alt="Detection" className="report-image" />
+                  );
+                })()}
+              </div>
               {alert.description && (
-                <p className="image-description">
-                  <strong>Description:</strong> {alert.description}
-                </p>
+                <div className="image-description">
+                  <p className="description-text">
+                    <strong>Description:</strong> {alert.description}
+                  </p>
+                </div>
               )}
             </div>
           </div>
 
+          {/* Trajectory Prediction */}
           <div className="report-section">
-            <h3>Future Trajectory Prediction</h3>
-            <button
-              className="trajectory-toggle"
-              onClick={() => setShowTrajectory(!showTrajectory)}
-            >
-              {showTrajectory ? "▼" : "▶"} Predicted Movement Path
-            </button>
+            <div className="section-header">
+              <h3>Future Trajectory Prediction</h3>
+            </div>
+            <div className="trajectory-section">
+              <button
+                className={`trajectory-toggle ${
+                  showTrajectory ? "active" : ""
+                }`}
+                onClick={() => setShowTrajectory(!showTrajectory)}
+              >
+                <span className="toggle-icon">
+                  {showTrajectory ? "▼" : "▶"}
+                </span>
+                <span className="toggle-text">Predicted Movement Path</span>
+                <span className="toggle-badge">AI-Powered</span>
+              </button>
 
-            {showTrajectory && (
-              <div className="trajectory-data">
-                <p className="trajectory-info">
-                  Based on ocean currents, wind direction, and wave patterns
-                </p>
-                <div className="trajectory-table">
-                  <div className="trajectory-header">
-                    <div className="col">Time Frame</div>
-                    <div className="col">Latitude</div>
-                    <div className="col">Longitude</div>
-                    <div className="col">Direction</div>
+              {showTrajectory && (
+                <div className="trajectory-data">
+                  <div className="trajectory-info-banner">
+                    <p className="trajectory-info">
+                      Based on ocean currents, wind direction, and wave patterns
+                    </p>
                   </div>
-                  {trajectoryData.map((point, idx) => (
-                    <div key={idx} className="trajectory-row">
-                      <div className="col">{point.time}</div>
-                      <div className="col">{point.lat.toFixed(4)}°</div>
-                      <div className="col">{point.lon.toFixed(4)}°</div>
-                      <div className="col">Northeast ↗</div>
-                    </div>
-                  ))}
+                  <div className="trajectory-table-wrapper">
+                    <table className="trajectory-table">
+                      <thead>
+                        <tr className="trajectory-header">
+                          <th>Time Frame</th>
+                          <th>Latitude</th>
+                          <th>Longitude</th>
+                          <th>Direction</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {trajectoryData.map((point, idx) => (
+                          <tr key={idx} className="trajectory-row">
+                            <td className="time-cell">{point.time}</td>
+                            <td className="coord-cell">
+                              {point.lat.toFixed(4)}°
+                            </td>
+                            <td className="coord-cell">
+                              {point.lon.toFixed(4)}°
+                            </td>
+                            <td className="direction-cell">
+                              <span className="direction-badge">
+                                <span className="direction-arrow">↗</span>
+                                Northeast
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="trajectory-warning">
+                    <p className="warning-text">
+                      Predictions based on current ocean conditions. Update as
+                      conditions change.
+                    </p>
+                  </div>
                 </div>
-                <p className="trajectory-warning">
-                  ⚠️ Predictions based on current ocean conditions. Update as
-                  conditions change.
-                </p>
-              </div>
-            )}
+              )}
 
-            <div style={{ marginTop: "0.75rem" }}>
               <button
                 className="show-trajectory-btn"
                 onClick={handleShowTrajectory}
               >
-                Show trajectory
+                Show Trajectory Map
+                <span className="btn-arrow">→</span>
               </button>
             </div>
           </div>
 
+          {/* Authority Response */}
           {alert.status === "pending" && (
-            <div className="report-section">
-              <h3>Authority Response & Cleanup Status</h3>
+            <div className="report-section response-section">
+              <div className="section-header">
+                <h3>Authority Response & Cleanup Status</h3>
+              </div>
               <div className="response-form">
-                <label>Send Response to Reporter:</label>
+                <label className="form-label">Send Response to Reporter</label>
                 <textarea
+                  className="response-textarea"
                   value={responseText}
                   onChange={(e) => setResponseText(e.target.value)}
                   placeholder="Enter your response here. E.g., 'We have dispatched a cleanup team to the location. ETA: 2 hours' or 'Investigation in progress...'"
-                  rows="4"
+                  rows="5"
                 />
                 <p className="textarea-hint">
-                  This message will be sent to {alert.reportedBy}
+                  This message will be sent to{" "}
+                  <strong>{alert.reportedBy}</strong> at{" "}
+                  <strong>{alert.reportedByEmail}</strong>
                 </p>
 
                 <div className="action-buttons">
@@ -240,9 +339,11 @@ export default function AlertReport({
                     className="mark-clean-btn"
                     onClick={handleMarkAsClean}
                   >
+                    <span className="btn-icon">✅</span>
                     Mark as Cleaned & Send Response
                   </button>
                   <button className="cancel-btn" onClick={onClose}>
+                    <span className="btn-icon">✕</span>
                     Close Report
                   </button>
                 </div>
@@ -250,19 +351,44 @@ export default function AlertReport({
             </div>
           )}
 
+          {/* Cleaned Section */}
           {alert.status === "cleaned" && (
             <div className="report-section cleaned-section">
-              <h3>Cleanup Completed</h3>
-              <div className="cleaned-info">
-                <p>
-                  <strong>Cleaned By:</strong> {alert.cleanedBy}
-                </p>
-                <p>
-                  <strong>Date:</strong> {alert.cleanedAt}
-                </p>
-                <p>
-                  <strong>Authority Response:</strong> {alert.authorityResponse}
-                </p>
+              <div className="section-header">
+                <h3>
+                  <span className="section-icon">✅</span>
+                  Cleanup Completed
+                </h3>
+              </div>
+              <div className="cleaned-card">
+                <div className="cleaned-icon-wrapper">
+                  <span className="cleaned-icon">✅</span>
+                </div>
+                <div className="cleaned-details">
+                  <div className="cleaned-item">
+                    <span className="cleaned-label">
+                      <span className="item-icon">👥</span>
+                      Cleaned By
+                    </span>
+                    <span className="cleaned-value">{alert.cleanedBy}</span>
+                  </div>
+                  <div className="cleaned-item">
+                    <span className="cleaned-label">
+                      <span className="item-icon">📅</span>
+                      Completion Date
+                    </span>
+                    <span className="cleaned-value">{alert.cleanedAt}</span>
+                  </div>
+                  <div className="cleaned-item full-width">
+                    <span className="cleaned-label">
+                      <span className="item-icon">💬</span>
+                      Authority Response
+                    </span>
+                    <p className="cleaned-response">
+                      {alert.authorityResponse}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

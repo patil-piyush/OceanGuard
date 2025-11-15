@@ -6,7 +6,6 @@ import "../styles/detection.css";
 import { formatLatLng, getIpLocation } from "../utils/geolocation";
 
 export default function OilSpillageDetection({ userRole }) {
-  // Use the image named `doil.jpg` from the public assets folder
   const HARDCODED_OIL_IMAGE = "/assets/doil.jpg";
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -94,7 +93,6 @@ export default function OilSpillageDetection({ userRole }) {
 
     setIsAnalyzing(true);
 
-    // Simulate API call for oil spillage analysis
     setTimeout(() => {
       const latForFormat = latitudeNum != null ? latitudeNum : Number(latitude);
       const lngForFormat =
@@ -108,7 +106,6 @@ export default function OilSpillageDetection({ userRole }) {
         confidence: Math.floor(Math.random() * 15) + 85,
         coordinates: coordsFormatted,
         timestamp: new Date().toLocaleString(),
-        // Use the doil.jpg image from the public assets folder
         imageUrl: HARDCODED_OIL_IMAGE,
         environmentalImpact: "High - Marine life affected",
         suggestions: [
@@ -121,7 +118,6 @@ export default function OilSpillageDetection({ userRole }) {
 
       setAnalysisResult(mockResult);
 
-      // Add to history
       const severity = mockResult.severity;
       setDetectionHistory((prev) => [
         {
@@ -140,169 +136,243 @@ export default function OilSpillageDetection({ userRole }) {
 
   return (
     <div className="detection-container">
+      <div className="detection-header oil-header">
+        <div className="header-content">
+          <h1 className="page-title">
+            Oil Spillage Detection
+          </h1>
+          <p className="page-subtitle">
+            Upload satellite or drone imagery to detect and analyze oil spills
+            using advanced AI
+          </p>
+        </div>
+      </div>
+
       <div className="detection-layout">
         {/* Left Panel - Detection Input */}
         <div className="detection-panel">
-          <h2>Oil Spillage Detection</h2>
-
-          <form onSubmit={handleAnalyze} className="detection-form">
-            {/* Info Text */}
-            <div className="form-section info-section">
-              <p className="info-text">
-                Upload satellite or drone imagery to detect and analyze oil
-                spills in real-time.
-              </p>
+          <div className="panel-card">
+            <div className="card-header-detection oil-card-header">
+              <h2>Upload & Analyze</h2>
+              <span className="step-indicator oil-step">Step 1 of 2</span>
             </div>
 
-            {/* Image Upload */}
-            <div className="form-section">
-              <label className="section-title">Upload Image</label>
-              <div className="image-upload">
-                {imagePreview ? (
-                  <div className="image-preview">
-                    <a
-                      href={imagePreview}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        src={imagePreview || "/placeholder.svg"}
-                        alt="Preview"
+            <form onSubmit={handleAnalyze} className="detection-form">
+              
+
+              {/* Image Upload */}
+              <div className="form-section">
+                <label className="section-title">
+                  <span className="section-icon">🛰️</span>
+                  Upload Satellite/Drone Image
+                  <span className="required">*</span>
+                </label>
+                <div className="image-upload">
+                  {imagePreview ? (
+                    <div className="image-preview">
+                      <a
+                        href={imagePreview}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="preview-link"
+                      >
+                        <img
+                          src={imagePreview || "/placeholder.svg"}
+                          alt="Preview"
+                          className="preview-image"
+                        />
+                        <div className="preview-overlay">
+                          <span className="preview-text">
+                            Click to view full size
+                          </span>
+                        </div>
+                      </a>
+                      <button
+                        type="button"
+                        className="btn-remove-image"
+                        onClick={() => {
+                          setImageFile(null);
+                          setImagePreview(null);
+                        }}
+                      >
+                        <span className="remove-icon">✕</span>
+                        Remove Image
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="upload-box oil-upload">
+                      <span className="upload-icon">🛰️</span>
+                      <span className="upload-text">
+                        Click to upload satellite/drone image
+                      </span>
+                      <span className="upload-hint">
+                        Supports: JPG, PNG, GeoTIFF (Max 10MB)
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        hidden
                       />
-                    </a>
-                    <button
-                      type="button"
-                      className="btn-remove-image"
-                      onClick={() => {
-                        setImageFile(null);
-                        setImagePreview(null);
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ) : (
-                  <label className="upload-box">
-                    <span className="upload-icon">🛰️</span>
-                    <span className="upload-text">
-                      Click to upload satellite/drone image
-                    </span>
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Location Input */}
+              <div className="form-section">
+                <label className="section-title">
+                  Location
+                  <span className="required">*</span>
+                </label>
+
+                <div className="location-mode">
+                  <label
+                    className={`mode-option ${
+                      locationMode === "current" ? "active" : ""
+                    }`}
+                  >
                     <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      hidden
+                      type="radio"
+                      name="locationMode"
+                      value="current"
+                      checked={locationMode === "current"}
+                      onChange={(e) => setLocationMode(e.target.value)}
                     />
+                    <span className="mode-label">Current Location (GPS)</span>
                   </label>
+                  <label
+                    className={`mode-option ${
+                      locationMode === "manual" ? "active" : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="locationMode"
+                      value="manual"
+                      checked={locationMode === "manual"}
+                      onChange={(e) => setLocationMode(e.target.value)}
+                    />
+                    <span className="mode-label">Manual Input</span>
+                  </label>
+                </div>
+
+                {locationMode === "current" && (
+                  <button
+                    type="button"
+                    className="btn-get-location"
+                    onClick={handleGetCurrentLocation}
+                    disabled={gettingLocation}
+                  >
+                      {gettingLocation}
+                    
+                    {gettingLocation
+                      ? "Getting location..."
+                      : "Get Current Location"}
+                  </button>
                 )}
-              </div>
-            </div>
 
-            {/* Location Input */}
-            <div className="form-section">
-              <label className="section-title">Location</label>
-              <div className="location-mode">
-                <label>
-                  <input
-                    type="radio"
-                    name="locationMode"
-                    value="current"
-                    checked={locationMode === "current"}
-                    onChange={(e) => setLocationMode(e.target.value)}
-                  />
-                  Current Location (GPS)
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="locationMode"
-                    value="manual"
-                    checked={locationMode === "manual"}
-                    onChange={(e) => setLocationMode(e.target.value)}
-                  />
-                  Manual Input
-                </label>
-              </div>
-
-              {locationMode === "current" ? (
-                <button
-                  type="button"
-                  className="btn-get-location"
-                  onClick={handleGetCurrentLocation}
-                  disabled={gettingLocation}
-                >
-                  {gettingLocation
-                    ? "⏳ Getting location..."
-                    : "📍 Get Current Location"}
-                </button>
-              ) : null}
-
-              <div className="coord-inputs">
-                <div className="coord-input">
-                  <label htmlFor="latitude-oil">Latitude</label>
-                  <input
-                    id="latitude-oil"
-                    type="text"
-                    placeholder="45.123456"
-                    value={
-                      locationMode === "current" && latitudeNum != null
-                        ? formatLatLng(latitudeNum, longitudeNum).latStr
-                        : latitude
-                    }
-                    onChange={(e) => setLatitude(e.target.value)}
-                    readOnly={locationMode === "current"}
-                  />
-                </div>
-                <div className="coord-input">
-                  <label htmlFor="longitude-oil">Longitude</label>
-                  <input
-                    id="longitude-oil"
-                    type="text"
-                    placeholder="120.456789"
-                    value={
-                      locationMode === "current" && longitudeNum != null
-                        ? formatLatLng(latitudeNum, longitudeNum).lngStr
-                        : longitude
-                    }
-                    onChange={(e) => setLongitude(e.target.value)}
-                    readOnly={locationMode === "current"}
-                  />
+                <div className="coord-inputs">
+                  <div className="coord-input">
+                    <label htmlFor="latitude-oil">
+                      Latitude
+                    </label>
+                    <input
+                      id="latitude-oil"
+                      type="text"
+                      placeholder="45.123456"
+                      value={
+                        locationMode === "current" && latitudeNum != null
+                          ? formatLatLng(latitudeNum, longitudeNum).latStr
+                          : latitude
+                      }
+                      onChange={(e) => setLatitude(e.target.value)}
+                      readOnly={locationMode === "current"}
+                      className="coord-input-field"
+                    />
+                  </div>
+                  <div className="coord-input">
+                    <label htmlFor="longitude-oil">
+                      Longitude
+                    </label>
+                    <input
+                      id="longitude-oil"
+                      type="text"
+                      placeholder="120.456789"
+                      value={
+                        locationMode === "current" && longitudeNum != null
+                          ? formatLatLng(latitudeNum, longitudeNum).lngStr
+                          : longitude
+                      }
+                      onChange={(e) => setLongitude(e.target.value)}
+                      readOnly={locationMode === "current"}
+                      className="coord-input-field"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="btn-analyze"
-              disabled={isAnalyzing}
-            >
-              {isAnalyzing ? "🔄 Analyzing..." : "🔍 Analyze Image"}
-            </button>
-          </form>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className="btn-analyze oil-analyze"
+                disabled={isAnalyzing}
+              >
+                {isAnalyzing}
+                {isAnalyzing ? "Analyzing..." : "Analyze Image"}
+                {!isAnalyzing && <span className="btn-arrow">→</span>}
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* Right Panel - Analysis Result */}
         {isAnalyzing && !analysisResult ? (
-          <div className="analysis-loading" role="status" aria-live="polite">
-            <div className="spinner" aria-hidden="true"></div>
-            <div className="loading-text">Analyzing image…</div>
+          <div className="analysis-panel">
+            <div className="analysis-loading" role="status" aria-live="polite">
+              <div className="spinner-wrapper">
+                <div className="spinner oil-spinner" aria-hidden="true"></div>
+                <div className="spinner-glow oil-glow"></div>
+              </div>
+              <div className="loading-text">
+                Analyzing oil spillage with AI...
+              </div>
+              <div className="loading-subtext">
+                Detecting affected area and severity
+              </div>
+            </div>
           </div>
         ) : null}
 
         {analysisResult && (
-          <OilAnalysis
-            result={analysisResult}
-            userRole={userRole}
-            onClose={() => setAnalysisResult(null)}
-          />
+          <div className="analysis-panel">
+            <OilAnalysis
+              result={analysisResult}
+              userRole={userRole}
+              onClose={() => setAnalysisResult(null)}
+            />
+          </div>
         )}
       </div>
 
       {/* History Section */}
       <div className="history-section">
-        <h3>Oil Spillage Detection History</h3>
-        <div className="history-table">
+        <div className="history-header">
+          <div className="history-title-section">
+            <h3 className="history-title">
+              Oil Spillage Detection History
+            </h3>
+            <p className="history-subtitle">
+              View your previous oil spillage detection results
+            </p>
+          </div>
+          <button className="btn-export">
+            <span className="export-icon">📥</span>
+            Export Data
+          </button>
+        </div>
+
+        <div className="history-table oil-history">
           <div className="table-header">
             <div className="col-severity">Severity</div>
             <div className="col-area">Affected Area</div>
@@ -314,14 +384,27 @@ export default function OilSpillageDetection({ userRole }) {
               <div key={item.id} className="table-row">
                 <div className="col-severity">
                   <span
-                    className={`severity-badge ${item.severity.toLowerCase()}`}
+                    className={`severity-badge severity-${item.severity.toLowerCase()}`}
                   >
+                    <span className="severity-icon">
+                      {item.severity === "High"
+                        ? "🔴"
+                        : item.severity === "Medium"
+                        ? "🟡"
+                        : "🟢"}
+                    </span>
                     {item.severity}
                   </span>
                 </div>
-                <div className="col-area">{item.area}</div>
-                <div className="col-location">{item.location}</div>
-                <div className="col-date">{item.date}</div>
+                <div className="col-area">
+                  <span className="area-text">📏 {item.area}</span>
+                </div>
+                <div className="col-location">
+                  <span className="location-text">📍 {item.location}</span>
+                </div>
+                <div className="col-date">
+                  <span className="date-text">🕒 {item.date}</span>
+                </div>
               </div>
             ))}
           </div>
