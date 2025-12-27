@@ -304,17 +304,6 @@ export default function TrajectoryMap({ latitude, longitude, type }) {
   return (
     <div className="trajectory-map">
       <div className="map-header">
-        <div className="map-title-section">
-          <span className="map-icon">{type === "debris" ? "🗑️" : "🛢️"}</span>
-          <div className="map-title-text">
-            <h4>
-              {type === "debris"
-                ? "Debris Movement Forecast"
-                : "Oil Spill Drift Forecast"}
-            </h4>
-            <p>24-hour predicted trajectory based on ocean conditions</p>
-          </div>
-        </div>
       </div>
 
       <div className="map-wrapper">
